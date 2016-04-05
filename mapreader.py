@@ -95,17 +95,37 @@ class MapReader:
         return brush
     
     def parse_entity(self, content):
-        classname = self.get_value("classname", content)
+        possible_properties = (
+            'classname',
+            'sounds',
+            'wad',
+            'worldtype',
+            'origin',
+            'wait',
+            'targetname'
+            'angle',
+            "light"
+        )
+        
+        xyz_properties = (
+            'origin',
+        )
+        
+        entity = {}
+        
+        for prop in possible_properties:
+             prop_val = self.get_value(prop, content)
+             if prop_val is not None:
+                if prop in xyz_properties:
+                    prop_val = prop_val.split(" ")
+                entity[prop] = prop_val
+       
         brush_content = self.get_brush(content)
         if brush_content is not None:
-            brush_data = self.parse_brush(brush_content)
-        else:
-            brush_data = None
+            entity['brush'] = self.parse_brush(brush_content)
         
-        return {
-            'classname': classname,
-            'brush': brush_data,
-        }
+        return entity
+        
         
     def divide_entities(self):
         temp_content = self.content
