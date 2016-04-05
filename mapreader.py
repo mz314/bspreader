@@ -39,11 +39,10 @@ class MapReader:
     def get_brush(self, content):
         s_pos = content.find("{")
         e_pos = content.find("}")
-        if s_pos and e_pos:
+        if s_pos!=-1 and e_pos!=-1:
             return content[s_pos+1:e_pos]
         else:
             return None
-    
     
     def parse_brush_line(self, brush_line):
         start_pos = 0
@@ -62,29 +61,51 @@ class MapReader:
             
             coords = c_line.split(" ")
             start_pos = p_end + 1
-            print(coords)
             abcoords.append(coords)
         
         
         s_pos = brush_line.find(" ", start_pos+1)
         tex = brush_line[start_pos+1:s_pos]
-        print(tex, start_pos, s_pos)
         
+        tex_numbers = []
+        
+        for i in range(0,5):
+            n_pos = brush_line.find(" ", s_pos+1)
+            n = brush_line[s_pos+1:n_pos]
+            s_pos = n_pos
+            tex_numbers.append(n)
+                
+        return {
+            'coords': abcoords,
+            'tex': tex,
+            'tex_numbers': tex_numbers
+        }
 
     def parse_brush(self, brush_content):
         lines = brush_content.split("\n")
+        
+        brush = []
         
         for line in lines:
             if line == "":
                 continue
             brush_line = self.parse_brush_line(line)
+            brush.append(brush_line)
         
-        #print(lines)
+        return brush
     
     def parse_entity(self, content):
-        val = self.get_value("classname", content)
-        brush = self.get_brush(content)
-        self.parse_brush(brush)
+        classname = self.get_value("classname", content)
+        brush_content = self.get_brush(content)
+        if brush_content is not None:
+            brush_data = self.parse_brush(brush_content)
+        else:
+            brush_data = None
+        
+        return {
+            'classname': classname,
+            'brush': brush_data,
+        }
         
     def divide_entities(self):
         temp_content = self.content

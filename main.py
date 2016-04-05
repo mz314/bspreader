@@ -13,6 +13,9 @@ reader.normalize()
 reader.divide_entities()
 
 for entity in reader.entity_content:
-    #print(entity)
-    reader.parse_entity(entity)
+    
+    parsed = reader.parse_entity(entity)
+    print("-----------------------------")
+    print(parsed)
+    
     
